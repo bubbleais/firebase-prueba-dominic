@@ -1,6 +1,7 @@
 // Importación de bibliotecas y componentes necesarios
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { getAuth, signOut } from 'firebase/auth';
 import { database } from '../config/firebase'; // Importa la configuración de la base de datos de Firebase
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'; // Importa funciones de Firestore para consultas en tiempo real
 import CardProductos from '../components/CardProductos'; // Importa el componente de tarjeta de producto
@@ -34,6 +35,17 @@ const Home = ({ navigation }) => {
     const goToAdd = () => { 
         navigation.navigate('Add');
     }
+
+    // Función para cerrar sesión
+    const handleSignOut = async () => {
+        const auth = getAuth();
+        try {
+            await signOut(auth);
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error('Error al cerrar sesión', error);
+        }
+    };
 
     // Función que renderiza cada item de la lista
     const renderItem = ({ item }) => (
@@ -70,10 +82,16 @@ const Home = ({ navigation }) => {
                 onPress={goToAdd}>
                 <Text style={styles.ButtonText}>Agregar Producto</Text>
             </TouchableOpacity>
+
+            {/* Botón para cerrar sesión */}
+            <TouchableOpacity
+                style={[styles.Button, styles.signOutButton]}
+                onPress={handleSignOut}>
+                <Text style={styles.ButtonText}>Cerrar Sesión</Text>
+            </TouchableOpacity>
         </View>
     );
 };
-
 
 // Exporta el componente Home como predeterminado
 export default Home;
@@ -106,6 +124,9 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginHorizontal: 50,
         paddingVertical: 20,
+    },
+    signOutButton: {
+        backgroundColor: '#d9534f',
     },
     ButtonText: {
         color: 'white',
